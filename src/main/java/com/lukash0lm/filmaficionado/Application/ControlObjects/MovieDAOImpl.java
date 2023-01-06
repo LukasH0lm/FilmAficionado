@@ -9,6 +9,8 @@ public class MovieDAOImpl implements MovieDAO {
 
     private LinkedList<Movie> movies = new LinkedList<>();
 
+    CategoryDAOImpl categoryDAO = new CategoryDAOImpl();
+
 
     public MovieDAOImpl() throws SQLException {
         try{
@@ -20,12 +22,21 @@ public class MovieDAOImpl implements MovieDAO {
         System.out.println("connected to the database... ");
 
 
+
         PreparedStatement ps = con.prepareStatement("SELECT * FROM Movie;");
         ResultSet rs = ps.executeQuery();
+
+
+
         System.out.println("Movies in database:");
+        LinkedList<Category> Moviecategories = new LinkedList<>();
         while (rs.next()) {
-            movies.add(new Movie(rs.getString("title"), rs.getString("director"), rs.getInt("year"), rs.getString("rating"), rs.getString("description"), rs.getString("image")));
-            System.out.println(rs.getInt("ID") + " - " + rs.getString("title"));
+
+
+
+            Movie newMovie = new Movie(rs.getInt("ID"), rs.getString("title"), rs.getString("director"), rs.getInt("year"), rs.getDouble("rating"), rs.getString("description"), CategoryDAOImpl.getCategoriesFromID(rs.getInt("ID")));
+            movies.add(newMovie);
+            System.out.println(newMovie);
         }
 
     }
@@ -44,10 +55,27 @@ public class MovieDAOImpl implements MovieDAO {
     }
 
     @Override
-    public void updateMovie(Movie movie) {
-        movies.remove(movie);
-        movies.add(movie);
+    public void updateMovieRating(Movie movie) throws SQLException {
+
+        PreparedStatement ps = con.prepareStatement("UPDATE Movie SET rating = ? WHERE ID = ?;");
+
+        ps.setInt(1, (int) movie.getRating());
+        ps.setInt(2, movie.getID());
+        ps.executeUpdate();
+
     }
+
+
+    public void addMovieCategory(Movie movie, Category category) throws SQLException {
+
+        PreparedStatement ps = con.prepareStatement("INSERT INTO CatMovie VALUES (?,?) ;");
+
+        ps.setInt(1, movie.getID());
+        ps.setInt(2, category.getID());
+        ps.executeUpdate();
+
+    }
+
 
     @Override
     public Movie getMovie(String title) {

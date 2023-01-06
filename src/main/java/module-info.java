@@ -3,6 +3,8 @@ module com.lukash0lm.filmaficionado {
     requires javafx.fxml;
     requires java.sql;
     requires org.controlsfx.controls;
+    requires java.desktop;
+    requires javafx.media;
 
 
     exports com.lukash0lm.filmaficionado.Controller;
