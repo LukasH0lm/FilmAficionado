@@ -24,30 +24,35 @@ public class MovieInputDialog extends Application {
         // create a label to show the input in text dialog
         Label l = new Label("no text input");
 
-        // create a text input dialog
-        TextInputDialog td = new TextInputDialog();
+        TextField title = new TextField();
+
+        TextField director = new TextField();
+
+        TextField genre = new TextField();
+
+
 
         // create a button
-        Button d = new Button("click");
+        Button submitButton = new Button("click");
 
         // create a event handler
-        EventHandler<ActionEvent> event = new EventHandler<ActionEvent>() {
+        EventHandler<ActionEvent> submitEvent = new EventHandler<ActionEvent>() {
             public void handle(ActionEvent e)
             {
                 // show the text input dialog
-                td.showAndWait();
-
-                // set the text of the label
-                l.setText(td.getEditor().getText());
+                System.out.println("Title: " + title.getText());
             }
         };
 
         // set on action of event
-        d.setOnAction(event);
+        submitButton.setOnAction(submitEvent);
 
-        // add button and label
-        r.getChildren().add(d);
-        r.getChildren().add(l);
+        r.getChildren().add(title);
+        r.getChildren().add(director);
+        r.getChildren().add(genre);
+
+        r.getChildren().add(submitButton);
+
 
         // create a scene
         Scene sc = new Scene(r, 500, 300);

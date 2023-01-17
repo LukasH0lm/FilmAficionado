@@ -13,6 +13,7 @@
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
 <?import org.controlsfx.control.Rating?>
 
 <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="750.0" prefWidth="919.0" style="-fx-background-color: #479cde;" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.lukash0lm.filmaficionado.Controller.FilmAficionadoController">
@@ -22,6 +23,7 @@
             <TableColumn fx:id="TableviewMovieColTitle" prefWidth="127.66357421875" text="Title" />
             <TableColumn fx:id="TableviewMovieColDirector" minWidth="0.0" prefWidth="115.6951904296875" text="Director" />
             <TableColumn fx:id="TableviewMovieColYear" prefWidth="127.66357421875" text="year" />
+            <TableColumn fx:id="TableviewMovieColImdbRating" prefWidth="127.66357421875" text="imdb rating" />
          </columns>
          <contextMenu>
             <ContextMenu>
@@ -56,10 +58,23 @@
       <Button fx:id="editSongButton" layoutX="84.0" layoutY="569.0" mnemonicParsing="false" onMouseClicked="#editMovie" text="Edit" />
       <Button fx:id="deleteSongButton" layoutX="140.0" layoutY="569.0" mnemonicParsing="false" onMouseClicked="#deleteMovie" text="Delete" />
       <ImageView fx:id="MovieImageView" fitHeight="216.0" fitWidth="353.0" layoutX="553.0" layoutY="79.0" pickOnBounds="true" preserveRatio="true" />
-      <TextArea fx:id="MovieDescriptionTextField" editable="false" layoutX="553.0" layoutY="295.0" prefHeight="261.0" prefWidth="345.0" wrapText="true" />
+      <TextArea fx:id="MovieDescriptionTextField" layoutX="553.0" layoutY="295.0" onInputMethodTextChanged="#EditDescription" prefHeight="216.0" prefWidth="345.0" wrapText="true" />
       <Button layoutX="553.0" layoutY="569.0" mnemonicParsing="false" onMouseClicked="#playMovie" text="play" />
       <Rating fx:id="ratingBar" layoutX="710.0" layoutY="566.0" onMouseClicked="#updateRating" rating="0.0" />
       <ComboBox fx:id="CategoryComboBox" layoutX="377.0" layoutY="39.0" onHiding="#changeCategoryView" prefWidth="150.0" promptText="All" />
-      <Button fx:id="newCategoryButton" layoutX="539.0" layoutY="39.0" mnemonicParsing="false" onMouseClicked="#newCategory" text="Button" />
+      <Button fx:id="newCategoryButton" layoutX="539.0" layoutY="39.0" mnemonicParsing="false" onMouseClicked="#newCategory" text="Add new category" />
+      <Button layoutX="658.0" layoutY="39.0" mnemonicParsing="false" onMouseClicked="#deleteCategory" text="Delete category" />
+      <Button layoutX="475.0" layoutY="14.0" mnemonicParsing="false" onMouseClicked="#updateCategoryList" text="update" />
+      <TextArea fx:id="CategoryTextField" layoutX="551.0" layoutY="519.0" prefHeight="42.0" prefWidth="345.0">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </TextArea>
+      <TextArea fx:id="bestMovieInCategoryTextField" layoutX="710.0" layoutY="619.0" prefHeight="25.0" prefWidth="176.0">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </TextArea>
+      <Button fx:id="nominateButton" layoutX="528.0" layoutY="628.0" mnemonicParsing="false" onAction="#nominateForBestInCategory" text="nominate for best in category" />
    </children>
 </Pane>

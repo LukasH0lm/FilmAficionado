@@ -6,16 +6,21 @@ public class Category {
     private int id;
     private final String title;
     private final String description;
-    private static LinkedList<Category> allCategories = new LinkedList<>();
-    public Category(int id, String title, String description) {
+    private Movie bestMovieInCategory;
+
+    private static final LinkedList<Category> allCategories = new LinkedList<>();
+
+
+    public Category(int id, String title, String description, Movie bestMovieInCategory) {
         this.id = id;
         this.title = title;
         this.description = description;
-        addToList();
+        addToList(this);
+        this.bestMovieInCategory = bestMovieInCategory;
     }
 
-    public void addToList(){
-        allCategories.add(this);
+    public static void addToList(Category category) {
+        allCategories.add(category);
     }
 
 
@@ -48,4 +53,22 @@ public class Category {
         return null;
     }
 
+    public void setID(int currentID) {
+        this.id = currentID;
+    }
+
+    public Movie getBestMovie() {
+        return this.bestMovieInCategory;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setBestMovie(int movieID) {
+
+        this.bestMovieInCategory = Movie.getMovieFromID(movieID);
+
+
+    }
 }
