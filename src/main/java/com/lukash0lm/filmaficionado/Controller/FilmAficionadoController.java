@@ -159,9 +159,7 @@ public class FilmAficionadoController {
         TableviewMovies.getItems().clear();
         for (Movie movie : movieDAO.getAllMovies()) {
             TableviewMovies.getItems().add(movie);
-
         }
-
     }
 
 
