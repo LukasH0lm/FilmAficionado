@@ -1,13 +1,7 @@
 package com.lukash0lm.filmaficionado.Application.ControlObjects;
 
-import javafx.scene.image.Image;
-
-import java.io.File;
-import java.io.IOException;
 import java.sql.*;
-import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Objects;
 
 public class CategoryDAOImpl implements CategoryDAO {
@@ -63,6 +57,13 @@ public class CategoryDAOImpl implements CategoryDAO {
             }
         }
         return null;
+    }
+
+    public static void deleteMovieFromAllCategories(Movie movie) throws SQLException {
+
+        PreparedStatement ps1 = con.prepareStatement("DELETE FROM CatMovie WHERE MovieId=" + movie.getID() + ";");
+        ps1.executeUpdate();
+
     }
 
 
@@ -124,12 +125,14 @@ public class CategoryDAOImpl implements CategoryDAO {
     @Override
     public void deleteCategory(Category category) throws SQLException {
 
+        PreparedStatement ps1 = con.prepareStatement("DELETE FROM BestMovieInCategory WHERE CategoryID=" + category.getID() + ";");
+        ps1.executeUpdate();
 
-        PreparedStatement ps = con.prepareStatement("DELETE FROM CatMovie WHERE ID=" + category.getID() + ";");
-        ps.executeUpdate();
-
-        PreparedStatement ps2 = con.prepareStatement("DELETE FROM Category WHERE ID=" + category.getID() + ";");
+        PreparedStatement ps2 = con.prepareStatement("DELETE FROM CatMovie WHERE CategoryId=" + category.getID() + ";");
         ps2.executeUpdate();
+
+        PreparedStatement ps3 = con.prepareStatement("DELETE FROM Category WHERE ID=" + category.getID() + ";");
+        ps3.executeUpdate();
 
         categories.remove(category);
         System.out.println(category.getTitle() + " has been deleted from database");
@@ -206,6 +209,14 @@ public class CategoryDAOImpl implements CategoryDAO {
 
     }
 
+    public static void deleteBestMovieFromAllCategories(Movie movie) throws SQLException {
+        PreparedStatement ps2 = con.prepareStatement("UPDATE BestMovieInCategory SET MovieID=? WHERE MovieID=?;");
+        ps2.setInt(1, 0);
+        ps2.setInt(2, movie.getID());
+        ps2.executeUpdate();
+        System.out.println("Best movie in category " + movie.getTitle() + " has been removed");
+    }
+
     public void checkForCategoryInBestMovieInCategory(Category category) throws SQLException {
             if (category.getBestMovie() == null) {
                 try {
@@ -218,10 +229,6 @@ public class CategoryDAOImpl implements CategoryDAO {
                 }
             }
         }
-
-    public Movie getBestMovieInCategory(Category category) {
-        return Movie.getMovieFromID(category.getBestMovie().getID());
-    }
 }
 
 

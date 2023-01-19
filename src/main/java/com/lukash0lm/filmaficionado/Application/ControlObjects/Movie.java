@@ -2,6 +2,10 @@ package com.lukash0lm.filmaficionado.Application.ControlObjects;
 
 import javafx.scene.image.Image;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.LinkedList;
 
 public class Movie {
@@ -18,19 +22,46 @@ public class Movie {
     private static final LinkedList<Movie> allMovies = new LinkedList<>();
 
 
-    public Movie(int id, String title, String director, int year, double rating,double imdbRating, String description, LinkedList<Category> categories) {
+    public Movie(int id, String title, String director, int year, double rating, double imdbRating, String description, LinkedList<Category> categories) throws IOException {
         this.id = id;
         this.title = title;
         this.director = director;
         this.year = Integer.toString(year);
-        this.rating = rating;
-        this.imdbRating = imdbRating;
         this.description = description;
-        this.image = new Image("file:src/main/resources/images/" + title + ".jpg");
+        this.imdbRating = imdbRating;
+        this.rating = rating;
+
+
+        this.image = retrieveImage(this);
         this.categories = categories;
 
         addToList(this);
 
+    }
+
+    public Image retrieveImage(Movie movie) {
+
+        String fileExtension;
+
+        Path imagePathjpg = Paths.get("C:\\Users\\lukas\\IdeaProjects\\FilmAficionado\\src\\main\\resources\\images\\" + movie.getTitle() + "." + "jpg");
+        if (Files.exists(imagePathjpg)) {
+            fileExtension = "jpg";
+
+        } else {
+            Path imagePathpng = Paths.get("C:\\Users\\lukas\\IdeaProjects\\FilmAficionado\\src\\main\\resources\\images\\" + movie.getTitle() + "." + "png");
+            if (Files.exists(imagePathpng)) {
+                fileExtension = "png";
+
+            } else {
+                Path imagePathgif = Paths.get("C:\\Users\\lukas\\IdeaProjects\\FilmAficionado\\src\\main\\resources\\images\\" + movie.getTitle() + "." + "gif");
+                if (Files.exists(imagePathgif)) {
+                    fileExtension = "gif";
+                } else {
+                    return null;
+                }
+            }
+        }
+        return new Image("file:src/main/resources/images/" + movie.getTitle() + "." + fileExtension);
     }
 
     public static void addToList(Movie movie) {
@@ -58,6 +89,7 @@ public class Movie {
     public double getImdbRating() {
         return imdbRating;
     }
+
     public String getYear() {
         return year;
     }
@@ -103,21 +135,23 @@ public class Movie {
         this.description = text;
     }
 
-    public Category getBestInCategory() {
+    public LinkedList<Category> getBestInCategories() {
+        LinkedList<Category> bestInCategories = new LinkedList<>();
         for (Category category : categories) {
-            if (category.getBestMovie() != null){
+            if (category.getBestMovie() != null) {
                 if (category.getBestMovie().equals(this)) {
-                return category;
+                    bestInCategories.add(category);
 
                 }
             }
         }
-        return null;
+        return bestInCategories;
     }
 
     public void setID(int id) {
         this.id = id;
     }
+
     public void setDirector(String director) {
         this.director = director;
     }
@@ -135,4 +169,7 @@ public class Movie {
     }
 
 
+    public String getMoviePath() {
+        return "C:\\Users\\lukas\\IdeaProjects\\FilmAficionado\\src\\main\\resources\\movies\\" + this.getTitle() + ".mp4";
+    }
 }

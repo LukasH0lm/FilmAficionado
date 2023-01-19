@@ -2,7 +2,6 @@ package com.lukash0lm.filmaficionado.Controller;
 
 import com.lukash0lm.filmaficionado.Application.BuisnessLogic.CategoryInputDialog;
 import com.lukash0lm.filmaficionado.Application.BuisnessLogic.FilmApplication;
-import com.lukash0lm.filmaficionado.Application.BuisnessLogic.MovieInputDialog;
 import com.lukash0lm.filmaficionado.Application.ControlObjects.Category;
 import com.lukash0lm.filmaficionado.Application.ControlObjects.CategoryDAOImpl;
 import com.lukash0lm.filmaficionado.Application.ControlObjects.Movie;
@@ -21,37 +20,32 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.media.Media;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.controlsfx.control.Rating;
-import javafx.scene.media.MediaPlayer;
 
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.sql.SQLException;
 import java.util.LinkedList;
-import java.util.Objects;
 
 public class FilmAficionadoController {
 
     LinkedList<Movie> allMovieList;
-    LinkedList<String> categoryList;
-    LinkedList<Movie> filteredMovieList;
     public static Movie currentMovie = null;
     public static boolean isEdit = false;
-    MovieDAOImpl movieDAO = new MovieDAOImpl();
-    CategoryDAOImpl categoryDAO = new CategoryDAOImpl();
+    MovieDAOImpl movieDAO;
+    CategoryDAOImpl categoryDAO;
 
-    public FilmAficionadoController() throws SQLException {
+    public FilmAficionadoController() {
     }
 
     public void initialize() throws IOException, SQLException {
+
+        categoryDAO = new CategoryDAOImpl();
+        movieDAO = new MovieDAOImpl();
+
+
         TableviewMovieColTitle.setCellValueFactory(new PropertyValueFactory<>("title"));
         TableviewMovieColDirector.setCellValueFactory(new PropertyValueFactory<>("director"));
         TableviewMovieColYear.setCellValueFactory(new PropertyValueFactory<>("year"));
@@ -65,7 +59,7 @@ public class FilmAficionadoController {
         updateCategoryList();
 
 
-        ObservableList<Movie> data =  TableviewMovies.getItems();
+        ObservableList<Movie> data = TableviewMovies.getItems();
         filterTextField.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
             if (oldValue != null && (newValue.length() < oldValue.length())) {
                 TableviewMovies.setItems(data);
@@ -86,11 +80,24 @@ public class FilmAficionadoController {
             TableviewMovies.setItems(subentries);
         });
 
+        if (!MovieDAOImpl.getLowestRatedMovies().isEmpty()){
 
+        Stage primaryStage = new Stage();
 
+        FXMLLoader fxmlLoader = new FXMLLoader(FilmApplication.class.getResource("/view/RemoveLowestRated-view.fxml"));
+        Scene scene = new Scene(fxmlLoader.load());
 
+        primaryStage.setOnCloseRequest(e -> {
+            System.out.println("Stage is closing");
+            updateTableviewMovies();
+        });
+
+        primaryStage.setScene(scene);
+        primaryStage.setTitle("Remove low rated movies");
+        primaryStage.show();
+        primaryStage.setAlwaysOnTop(true);
+        }
     }
-
 
 
     @FXML
@@ -127,13 +134,13 @@ public class FilmAficionadoController {
     private Button closeButton;
 
     @FXML
-    private Button deleteSongButton;
+    private Button newMovieButton;
 
     @FXML
-    private Button editSongButton;
+    private Button editMovieButton;
 
     @FXML
-    private Button newSongButton;
+    private Button deleteMovieButton;
 
     @FXML
     private Button newCategoryButton;
@@ -158,9 +165,11 @@ public class FilmAficionadoController {
     }
 
 
-
     @FXML
-    void deleteMovie(MouseEvent event) {
+    void deleteMovie(MouseEvent event) throws SQLException {
+        Movie movie = TableviewMovies.getSelectionModel().getSelectedItem();
+        MovieDAOImpl.deleteMovie(movie);
+        updateTableviewMovies();
 
     }
 
@@ -177,11 +186,33 @@ public class FilmAficionadoController {
         primaryStage.setTitle("Edit Movie");
         primaryStage.show();
 
+        onStageClose(primaryStage);
+
+    }
+
+    private void onStageClose(Stage primaryStage) {
+        //updates ui when stage is closed
+        primaryStage.setOnCloseRequest(e -> {
+            System.out.println("Stage is closing");
+
+            if (currentMovie != null) {
+                CategoryTextField.setText(currentMovie.getCategories().toString());
+                try {
+                    bestMovieInCategoryTextField.setText(movieDAO.getBestInCategories(currentMovie).toString());
+                } catch (SQLException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+            updateTableviewMovies();
+        });
     }
 
     @FXML
     void movieChosen(MouseEvent event) throws SQLException {
         currentMovie = TableviewMovies.getSelectionModel().getSelectedItem();
+        if (currentMovie == null){
+            return;
+        }
         updateUIRating(currentMovie.getRating());
         MovieDescriptionTextField.setText(currentMovie.getDescription());
         MovieImageView.setImage(currentMovie.getImage());
@@ -189,7 +220,7 @@ public class FilmAficionadoController {
         if (movieDAO.getBestInCategories(currentMovie) != null) {
             bestMovieInCategoryTextField.setText(movieDAO.getBestInCategories(currentMovie).toString());
 
-        }else{
+        } else {
             bestMovieInCategoryTextField.setText("");
         }
 
@@ -205,23 +236,20 @@ public class FilmAficionadoController {
         FXMLLoader fxmlLoader = new FXMLLoader(FilmApplication.class.getResource("/view/MovieInput-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
 
+        onStageClose(primaryStage);
+
         primaryStage.setScene(scene);
         primaryStage.setTitle("New Movie");
         primaryStage.show();
-        primaryStage.setOnCloseRequest(e -> {
-            updateTableviewMovies();
-        });
+
 
     }
 
 
     @FXML
-    void newCategory(MouseEvent event) throws SQLException, InterruptedException {
+    void newCategory(MouseEvent event) throws SQLException {
         CategoryInputDialog categoryInputDialog = new CategoryInputDialog(this);
         categoryInputDialog.start(new Stage());
-
-
-
 
 
     }
@@ -246,7 +274,7 @@ public class FilmAficionadoController {
 
     }
 
-    void updateUIRating(double newRating){
+    void updateUIRating(double newRating) {
         ratingBar.setRating(newRating);
     }
 
@@ -258,21 +286,21 @@ public class FilmAficionadoController {
         }
 
         for (Category category : CategoryDAOImpl.getAllCategories()) {
+            assert CategoryComboBox != null;
             CategoryComboBox.getItems().add(category);
         }
     }
 
 
-
-    public void changeCategoryView(){
+    public void changeCategoryView() {
         Category categoryBox = CategoryComboBox.getValue();
-        if (categoryBox == null){
+        if (categoryBox == null) {
             updateTableviewMovies();
         } else {
             TableviewMovies.getItems().clear();
             for (Movie movie : movieDAO.getAllMovies()) {
-                for(Category category : movie.getCategories()){
-                    if (category.getTitle().equals(categoryBox.getTitle())){
+                for (Category category : movie.getCategories()) {
+                    if (category.getTitle().equals(categoryBox.getTitle())) {
                         TableviewMovies.getItems().add(movie);
                     }
                 }
@@ -284,6 +312,8 @@ public class FilmAficionadoController {
         if (currentMovie != null) {
             currentMovie.setDescription(MovieDescriptionTextField.getText());
             movieDAO.updateMovieDescription(currentMovie);
+        }else{
+            System.out.println("No movie selected");
         }
     }
 
@@ -291,12 +321,31 @@ public class FilmAficionadoController {
     void nominateForBestInCategory(ActionEvent event) throws SQLException {
         if (currentMovie != null) {
             Category category = CategoryComboBox.getSelectionModel().getSelectedItem();
+            boolean hasCategory = false;
             if (category != null && !category.getTitle().equals("All")) {
-                categoryDAO.AddingBestMovieToCategory(currentMovie,category);
-                category.setBestMovie(currentMovie.getID());
-                bestMovieInCategoryTextField.setText(category.getTitle());
 
-            }else {
+                for (Category movieCategory : currentMovie.getCategories()) {
+                    if (movieCategory.getTitle().equals(category.getTitle())) {
+                       hasCategory = true;
+                       break;
+                    }
+
+                }
+
+                if (hasCategory) {
+                    categoryDAO.AddingBestMovieToCategory(currentMovie, category);
+                    category.setBestMovie(currentMovie.getID());
+                    bestMovieInCategoryTextField.setText(currentMovie.getBestInCategories().toString());
+                } else {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error");
+                    alert.setHeaderText("Error");
+                    alert.setContentText("Movie is not in this category");
+                    alert.showAndWait();
+                }
+
+
+            } else {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Error");
                 alert.setHeaderText("No category selected");

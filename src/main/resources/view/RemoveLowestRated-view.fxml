@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ContextMenu?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+
+
+<AnchorPane prefHeight="284.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.lukash0lm.filmaficionado.Controller.RemoveLowestRatedController">
+   <children>
+      <TableView fx:id="TableviewMovies" onMouseClicked="#movieChosen" prefHeight="283.0" prefWidth="498.0">
+         <columns>
+            <TableColumn fx:id="TableviewMovieColTitle" prefWidth="127.66357421875" text="Title" />
+            <TableColumn fx:id="TableviewMovieColDirector" minWidth="0.0" prefWidth="115.6951904296875" text="Director" />
+            <TableColumn fx:id="TableviewMovieColYear" prefWidth="127.66357421875" text="year" />
+            <TableColumn fx:id="TableviewMovieColImdbRating" prefWidth="127.66357421875" text="imdb rating" />
+         </columns>
+         <contextMenu>
+            <ContextMenu>
+               <items>
+                  <MenuItem mnemonicParsing="false" text="nominate for best in category" />
+               </items>
+            </ContextMenu>
+         </contextMenu>
+      </TableView>
+      <Button fx:id="removeButton" layoutX="519.0" layoutY="142.0" mnemonicParsing="false" onMouseClicked="#removeMovie" text="remove" />
+      <Button fx:id="removeAllButton" layoutX="511.0" layoutY="180.0" mnemonicParsing="false" onMouseClicked="#removeAllMovies" text="remove all" />
+      <Button fx:id="closeButton" layoutX="525.0" layoutY="244.0" mnemonicParsing="false" onMouseClicked="#close" text="close" />
+   </children>
+</AnchorPane>
